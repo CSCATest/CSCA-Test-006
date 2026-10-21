@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CSCA Mathematics Mock Exam - Mathematics: Trigonometry Functions</title>
+<title>CSCA Mathematics Mock Exam - Mathematics: Trigonometry Functions (Unit Test 6)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -478,7 +478,7 @@
     <div class="entry-card">
       <div class="entry-mark">CSCA</div>
       <h1>Mathematics Exam</h1>
-      <p class="entry-sub">Topic Assessment: <strong>Mathematics — Trigonometry Functions</strong></p>
+      <p class="entry-sub">Topic Assessment: <strong>Mathematics — Trigonometry Functions (Unit Test 6)</strong></p>
       
       <form id="entry-form" onsubmit="handleStartExam(event)">
         <div class="field">
@@ -496,7 +496,7 @@
       <div class="entry-meta">
         <span>⏱ 45 Minutes</span>
         <span>📝 25 Questions</span>
-        <span>🎯 Multiple Choice</span>
+        <span>🎯 Unit Test 6</span>
       </div>
     </div>
   </div>
@@ -510,9 +510,9 @@
     <header class="exam-header">
       <div class="exam-title">
         CSCA Mathematics Mock Exam
-        <small>Topic: Mathematics (Trigonometry Functions)</small>
+        <small>Topic: Mathematics (Trigonometry Functions) — Unit Test 6</small>
       </div>
-      <div class="timer-display" id="timer-display">60:00</div>
+      <div class="timer-display" id="timer-display">45:00</div>
     </header>
 
     <main class="exam-body">
@@ -551,7 +551,7 @@
         </div>
 
         <div class="question-card">
-          <span class="question-topic-tag">Mathematics — Trigonometry Functions</span>
+          <span class="question-topic-tag">Mathematics — Trigonometry Functions (Unit Test 6)</span>
           <div class="question-text" id="question-text">
             Question text will load here...
           </div>
@@ -600,6 +600,8 @@
         </div>
       </div>
 
+      <div id="export-status" style="text-align:center; font-size:13px; color:var(--ink-soft); margin-bottom:14px;"></div>
+
       <div style="text-align:center;">
         <button class="btn btn-primary" onclick="restartExam()">Restart Assessment</button>
       </div>
@@ -617,11 +619,8 @@
   <script>
     /* ==========================================================================
        1. QUESTION BANK: 25 Mathematics "Trigonometry Functions" Questions
-          Covers Inverse, Power, Exponential & Logarithmic Functions.
-          Includes questions from Dec, Jan, March, April, June papers & the
-          "Trigonometry Functions" lecture (Chapter 3).
        ========================================================================== */
-      const questions = [
+    const questions = [
   {
     id: 1,
     question: "An angle formed by a ray rotating in the clockwise direction, such as $-30^{\\circ}$, is called ( )",
@@ -740,7 +739,7 @@
       "D. None of the functions"
     ],
     correct: 2,
-    explanation: " The ASTC rule states: Quadrant I — All positive; Quadrant II — Sine positive; Quadrant III — Tangent positive; Quadrant IV — Cosine positive. So in Quadrant III, only tangent is positive. [Trigonometric Functions Lecture — Coordinate Definitions, ASTC Rule]"
+    explanation: "The ASTC rule states: Quadrant I — All positive; Quadrant II — Sine positive; Quadrant III — Tangent positive; Quadrant IV — Cosine positive. So in Quadrant III, only tangent is positive. [Trigonometric Functions Lecture — Coordinate Definitions, ASTC Rule]"
   },
   {
     id: 11,
@@ -908,7 +907,7 @@
       "D. The function is monotonically decreasing on $\\left(-\\dfrac{\\pi}{4},\\dfrac{\\pi}{4}\\right)$"
     ],
     correct: 3,
-    explanation: "Tangent is unbounded, so A is false. The domain excludes $x=\\tfrac{\\pi}{4}+\\tfrac{k\\pi}{2}$, so B is false. Since $\\tan(-2x)=-\\tan(2x)$ and $\\tan(2x)$ has period $\\tfrac{\\pi}{2}$, the period is $\\tfrac{\\pi}{2}$, not $\\pi$, so C is false. On $\\left(-\\tfrac{\\pi}{4},\\tfrac{\\pi}{4}\\right)$, $2x$ ranges over $\\left(-\\tfrac{\\pi}{2},\\tfrac{\\pi}{2}\\right)$ where $\\tan(2x)$ increases, so its negation decreases there — D is correct. [CSCA June Q39]"
+    explanation: "Tangent is unbounded, so A is false. The domain excludes $x=\\tfrac{\\pi}{4}+\\tfrac{k\\pi}{2}$, so B is false. Since $\\tan(-2x)=-\\tan(2x)$ and $\\tan(2x)$ has period $\\tfrac{\\pi}{2}$, the period is $\\tfrac{\\pi}{2}$, not $\\pi$, so C is false. On $\\left(-\\tfrac{\\pi}{4},\\dfrac{\\pi}{4}\\right)$, $2x$ ranges over $\\left(-\\tfrac{\\pi}{2},\\tfrac{\\pi}{2}\\right)$ where $\\tan(2x)$ increases, so its negation decreases there — D is correct. [CSCA June Q39]"
   },
   {
     id: 25,
@@ -924,16 +923,20 @@
   }
 ];
 
-
-
     /* ==========================================================================
-       2. EXAM STATE MANAGEMENT
+       2. EXAM STATE MANAGEMENT & CLOUDFLARE ENDPOINT
        ========================================================================== */
+    const RESULTS_API_URL = 'https://csca-results.csca-test.workers.dev/submit';
+    const PENDING_KEY = 'csca_pending_result_unit6';
+
     let studentInfo = { name: '', id: '' };
+    let entryTimestamp = null;
+    let exitTimestamp = null;
+    let submissionId = null;
     let currentQIndex = 0;
     let userAnswers = new Array(questions.length).fill(null);
     let markedQuestions = new Array(questions.length).fill(false);
-    let examDurationSeconds = 45 * 60; // 60 minutes
+    let examDurationSeconds = 45 * 60; // 45 minutes
     let timeRemaining = examDurationSeconds;
     let timerInterval = null;
 
@@ -1127,6 +1130,8 @@
 
       studentInfo.name = nameInput;
       studentInfo.id = idInput || 'CSCA-2026';
+      entryTimestamp = new Date();
+      submissionId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
 
       // Init Sidebar Info
       document.getElementById('display-student-name').textContent = studentInfo.name;
@@ -1270,7 +1275,7 @@
 
     function confirmSubmitExam() {
       const unanswered = userAnswers.filter(a => a === null).length;
-      let msg = "Are you sure you want to submit your exam?";
+      let msg = "Are you sure you want to finish and submit your exam?";
       if (unanswered > 0) {
         msg = `You have ${unanswered} unanswered question(s). Are you sure you want to finish and submit?`;
       }
@@ -1281,10 +1286,16 @@
 
     function submitExam() {
       clearInterval(timerInterval);
+      exitTimestamp = new Date();
 
       let correctCount = 0;
+      const wrongQuestions = [];
       userAnswers.forEach((ans, idx) => {
-        if (ans === questions[idx].correct) correctCount++;
+        if (ans === questions[idx].correct) {
+          correctCount++;
+        } else {
+          wrongQuestions.push(idx + 1); // 1-based, includes skipped
+        }
       });
 
       const totalPct = Math.round((correctCount / questions.length) * 100);
@@ -1314,8 +1325,74 @@
       buildReviewList();
 
       showScreen('screen-outro');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       if (window.MathJax) MathJax.typesetPromise([document.getElementById('review-list')]);
+
+      // Send result payload to Cloudflare D1 with Unit 6 tagged directly in username
+      submitResult({
+        id: submissionId,
+        username: `${studentInfo.name} [Unit 6]`,
+        candidateId: studentInfo.id,
+        test: "Unit Test 6",
+        unit: "Unit Test 6",
+        unitTest: 6,
+        topic: "Mathematics: Trigonometry Functions (Unit Test 6)",
+        score: correctCount,
+        total: questions.length,
+        percent: totalPct,
+        wrongQuestions: wrongQuestions,
+        startedAt: entryTimestamp ? entryTimestamp.toISOString() : null,
+        submittedAt: exitTimestamp.toISOString()
+      });
     }
+
+    /* ==========================================================================
+       6. CLOUDFLARE WORKER / D1 SYNC
+       ========================================================================== */
+    async function postResult(data) {
+      const res = await fetch(RESULTS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) throw new Error('Server responded ' + res.status);
+    }
+
+    async function submitResult(data) {
+      const statusEl = document.getElementById('export-status');
+      if (statusEl) statusEl.textContent = 'Saving your results…';
+
+      try { localStorage.setItem(PENDING_KEY, JSON.stringify(data)); } catch (e) {}
+
+      const delays = [0, 1500, 4000];
+      for (const d of delays) {
+        if (d) await new Promise(r => setTimeout(r, d));
+        try {
+          await postResult(data);
+          try { localStorage.removeItem(PENDING_KEY); } catch (e) {}
+          if (statusEl) statusEl.textContent = '✅ Results saved (Unit Test 6).';
+          return;
+        } catch (err) {
+          console.error('Result upload failed:', err);
+        }
+      }
+      if (statusEl) statusEl.textContent = '⚠️ Could not save results. Keep this page open and check your connection; it will retry automatically.';
+      const t = setInterval(async () => {
+        try {
+          await postResult(data);
+          clearInterval(t);
+          try { localStorage.removeItem(PENDING_KEY); } catch (e) {}
+          if (statusEl) statusEl.textContent = '✅ Results saved (Unit Test 6).';
+        } catch (e) {}
+      }, 15000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const raw = localStorage.getItem(PENDING_KEY);
+        if (raw) postResult(JSON.parse(raw)).then(() => localStorage.removeItem(PENDING_KEY)).catch(() => {});
+      } catch (e) {}
+    });
 
     function buildReviewList() {
       const list = document.getElementById('review-list');
@@ -1348,6 +1425,11 @@
       userAnswers.fill(null);
       markedQuestions.fill(false);
       currentQIndex = 0;
+      entryTimestamp = null;
+      exitTimestamp = null;
+      submissionId = null;
+      const statusEl = document.getElementById('export-status');
+      if (statusEl) statusEl.textContent = '';
       showScreen('screen-entry');
     }
   </script>
